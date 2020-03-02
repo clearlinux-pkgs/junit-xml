@@ -4,7 +4,7 @@
 #
 Name     : junit-xml
 Version  : 1.8
-Release  : 6
+Release  : 7
 URL      : https://files.pythonhosted.org/packages/a6/2a/f8d5aab80bb31fcc789d0f2b34b49f08bd6121cd8798d2e37f416df2b9f8/junit-xml-1.8.tar.gz
 Source0  : https://files.pythonhosted.org/packages/a6/2a/f8d5aab80bb31fcc789d0f2b34b49f08bd6121cd8798d2e37f416df2b9f8/junit-xml-1.8.tar.gz
 Summary  : Creates JUnit XML test result documents that can be read by tools such as Jenkins
@@ -23,7 +23,95 @@ BuildRequires : tox
 BuildRequires : virtualenv
 
 %description
+python-junit-xml
 ================
+.. image:: https://travis-ci.org/kyrus/python-junit-xml.png?branch=master
+
+About
+-----
+
+A Python module for creating JUnit XML test result documents that can be
+read by tools such as Jenkins. If you are ever working with test tool or
+test suite written in Python and want to take advantage of Jenkins'
+pretty graphs and test reporting capabilities, this module will let you
+generate the XML test reports.
+
+*As there is no definitive Jenkins JUnit XSD that I could find, the XML
+documents created by this module support a schema based on Google
+searches and the Jenkins JUnit XML reader source code. File a bug if
+something doesn't work like you expect it to.*
+
+Installation
+------------
+
+Install using pip or easy_install:
+
+::
+
+	pip install junit-xml
+	or
+	easy_install junit-xml
+
+You can also clone the Git repository from Github and install it manually:
+
+::
+
+    git clone https://github.com/kyrus/python-junit-xml.git
+    python setup.py install
+
+Using
+-----
+
+Create a test suite, add a test case, and print it to the screen:
+
+.. code-block:: python
+
+    from junit_xml import TestSuite, TestCase
+
+    test_cases = [TestCase('Test1', 'some.class.name', 123.345, 'I am stdout!', 'I am stderr!')]
+    ts = TestSuite("my test suite", test_cases)
+    # pretty printing is on by default but can be disabled using prettyprint=False
+    print(TestSuite.to_xml_string([ts]))
+
+Produces the following output
+
+.. code-block:: xml
+
+    <?xml version="1.0" ?>
+    <testsuites>
+        <testsuite errors="0" failures="0" name="my test suite" tests="1">
+            <testcase classname="some.class.name" name="Test1" time="123.345000">
+                <system-out>
+                    I am stdout!
+                </system-out>
+                <system-err>
+                    I am stderr!
+                </system-err>
+            </testcase>
+        </testsuite>
+    </testsuites>
+
+Writing XML to a file:
+
+.. code-block:: python
+
+    # you can also write the XML to a file and not pretty print it
+    with open('output.xml', 'w') as f:
+        TestSuite.to_file(f, [ts], prettyprint=False)
+
+See the docs and unit tests for more examples.
+
+NOTE: Unicode characters identified as "illegal or discouraged" are automatically
+stripped from the XML string or file.
+
+Running the tests
+-----------------
+
+::
+
+    # activate your virtualenv
+    pip install tox
+    tox
 
 %package license
 Summary: license components for the junit-xml package.
@@ -46,6 +134,7 @@ python components for the junit-xml package.
 Summary: python3 components for the junit-xml package.
 Group: Default
 Requires: python3-core
+Provides: pypi(junit-xml)
 
 %description python3
 python3 components for the junit-xml package.
@@ -60,7 +149,8 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1574288037
+export SOURCE_DATE_EPOCH=1583162473
+# -Werror is for werrorists
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
